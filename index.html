@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sandglass Grain Control</title>
+    <style>
+        :root {
+            --bg0: #0e1d2f;
+            --bg1: #163a5f;
+            --card: rgba(255, 255, 255, 0.14);
+            --line: rgba(255, 255, 255, 0.2);
+            --text: #f5f7ff;
+            --muted: #d2def0;
+            --accent: #ffd166;
+            --ok: #88f6a0;
+            --warn: #ffcc5b;
+            --bad: #ff8f8f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(1200px 500px at 85% -10%, #2b78bf66 0%, transparent 65%),
+                radial-gradient(1000px 450px at -20% 100%, #f6a62333 0%, transparent 65%),
+                linear-gradient(135deg, var(--bg0), var(--bg1));
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .panel {
+            width: min(760px, 100%);
+            border: 1px solid var(--line);
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+            animation: rise 300ms ease-out;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+            letter-spacing: 0.02em;
+        }
+
+        .sub {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        button {
+            border: 1px solid var(--line);
+            background: #103150;
+            color: var(--text);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 100ms ease, background 150ms ease;
+        }
+
+        button:hover {
+            background: #154166;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .accent {
+            background: #805f09;
+            border-color: #f7cb5f66;
+        }
+
+        .accent:hover {
+            background: #97720b;
+        }
+
+        .pill {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 12px;
+            background: #0d2a46;
+            font-size: 0.9rem;
+        }
+
+        .connected {
+            color: var(--ok);
+        }
+
+        .disconnected {
+            color: var(--bad);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin: 10px 0 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        input[type="number"] {
+            width: 100px;
+            border: 1px solid var(--line);
+            background: #0d2a46;
+            color: var(--text);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 1rem;
+        }
+
+        .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .log {
+            margin-top: 10px;
+            border: 1px solid var(--line);
+            background: #081c30;
+            border-radius: 12px;
+            height: 220px;
+            overflow: auto;
+            padding: 10px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .help {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.35;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="panel">
+        <h1>Sandglass Grain Control</h1>
+        <p class="sub">Connect in Google Chrome, read the active grains, and set a new count over WebUSB serial.</p>
+
+        <div class="row">
+            <button id="connectBtn" class="accent">Connect</button>
+            <button id="disconnectBtn" disabled>Disconnect</button>
+            <button id="refreshBtn" disabled>Read Current</button>
+            <span id="statusPill" class="pill disconnected">Disconnected</span>
+            <span class="pill">Current: <span id="currentValue" class="value">-</span></span>
+        </div>
+
+        <div class="grid">
+            <input id="grainSlider" type="range" min="1" max="90" step="1" value="90" disabled />
+            <input id="grainInput" type="number" min="1" max="90" value="90" disabled />
+        </div>
+
+        <div class="row">
+            <button id="setBtn" disabled>Set Grains</button>
+            <button id="helpBtn" disabled>Help</button>
+        </div>
+
+        <div id="log" class="log" aria-live="polite"></div>
+
+        <p class="help">
+            If Connect fails: run this page from localhost (not file://). Example: <b>python -m http.server 8080</b> in
+            this folder, then open <b>http://localhost:8080/index.html</b>.
+        </p>
+    </main>
+
+    <script>
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const setBtn = document.getElementById('setBtn');
+        const helpBtn = document.getElementById('helpBtn');
+        const slider = document.getElementById('grainSlider');
+        const input = document.getElementById('grainInput');
+        const statusPill = document.getElementById('statusPill');
+        const currentValue = document.getElementById('currentValue');
+        const logEl = document.getElementById('log');
+
+        let port = null;
+        let reader = null;
+        let writer = null;
+        let keepReading = false;
+
+        function log(msg) {
+            const ts = new Date().toLocaleTimeString();
+            logEl.textContent += `[${ts}] ${msg}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function setConnectedUI(connected) {
+            disconnectBtn.disabled = !connected;
+            refreshBtn.disabled = !connected;
+            setBtn.disabled = !connected;
+            helpBtn.disabled = !connected;
+            slider.disabled = !connected;
+            input.disabled = !connected;
+            statusPill.textContent = connected ? 'Connected' : 'Disconnected';
+            statusPill.className = `pill ${connected ? 'connected' : 'disconnected'}`;
+            connectBtn.disabled = connected;
+        }
+
+        function syncValueFromSlider() {
+            input.value = slider.value;
+        }
+
+        function syncValueFromInput() {
+            const min = Number(input.min);
+            const max = Number(input.max);
+            let v = Number(input.value);
+            if (!Number.isFinite(v)) v = min;
+            v = Math.max(min, Math.min(max, Math.round(v)));
+            input.value = String(v);
+            slider.value = String(v);
+        }
+
+        function parseLine(line) {
+            const mCurrent = line.match(/\[WEBUSB\]\s+grains=(\d+)/);
+            if (mCurrent) {
+                const value = Number(mCurrent[1]);
+                if (Number.isFinite(value)) {
+                    currentValue.textContent = String(value);
+                    slider.value = String(value);
+                    input.value = String(value);
+                }
+            }
+
+            const mSet = line.match(/\[WEBUSB\]\s+grains set to\s+(\d+)/i);
+            if (mSet) {
+                const value = Number(mSet[1]);
+                if (Number.isFinite(value)) {
+                    currentValue.textContent = String(value);
+                }
+            }
+
+            const mRange = line.match(/commands:\s+grains <1-(\d+)>/i);
+            if (mRange) {
+                const max = Number(mRange[1]);
+                if (Number.isFinite(max) && max > 0) {
+                    slider.max = String(max);
+                    input.max = String(max);
+                    syncValueFromInput();
+                }
+            }
+        }
+
+        async function sendCommand(cmd) {
+            if (!writer) return;
+            try {
+                await writer.write(`${cmd}\n`);
+                log(`> ${cmd}`);
+            } catch (err) {
+                log(`Write error: ${err.message}`);
+            }
+        }
+
+        async function startReadLoop() {
+            if (!port || !port.readable) return;
+
+            const decoder = new TextDecoderStream();
+            const inputDone = port.readable.pipeTo(decoder.writable);
+            const inputStream = decoder.readable;
+            reader = inputStream.getReader();
+
+            try {
+                while (keepReading) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    if (value) {
+                        const lines = value.split('\n');
+                        for (const line of lines) {
+                            const cleanLine = line.trim();
+                            if (cleanLine) {
+                                log(cleanLine);
+                                parseLine(cleanLine);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                log(`Read error: ${err.message}`);
+            } finally {
+                reader.releaseLock();
+            }
+        }
+
+        async function connect() {
+            if (!('serial' in navigator)) {
+                alert('Web Serial API is not available. Use Google Chrome over HTTPS/localhost.');
+                return;
+            }
+
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+
+                const encoder = new TextEncoderStream();
+                encoder.readable.pipeTo(port.writable);
+                writer = encoder.writable.getWriter();
+
+                setConnectedUI(true);
+                keepReading = true;
+                log('connected');
+
+                startReadLoop(); // Run in background
+                await sendCommand('help');
+                await sendCommand('grains?');
+            } catch (err) {
+                log(`connect failed: ${err.message}`);
+                await disconnect();
+            }
+        }
+
+        async function disconnect() {
+            keepReading = false;
+
+            try {
+                if (reader) {
+                    await reader.cancel();
+                    reader = null;
+                }
+            } catch (_) { }
+
+            try {
+                if (writer) {
+                    await writer.close();
+                    writer = null;
+                }
+            } catch (_) { }
+
+            try {
+                if (port) {
+                    await port.close();
+                    port = null;
+                }
+            } catch (_) { }
+
+            setConnectedUI(false);
+            log('disconnected');
+        }
+
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        refreshBtn.addEventListener('click', () => sendCommand('grains?'));
+        helpBtn.addEventListener('click', () => sendCommand('help'));
+
+        setBtn.addEventListener('click', async () => {
+            syncValueFromInput();
+            await sendCommand(`grains ${input.value}`);
+            await sendCommand('grains?');
+        });
+
+        slider.addEventListener('input', syncValueFromSlider);
+        input.addEventListener('input', syncValueFromInput);
+
+        setConnectedUI(false);
+        syncValueFromInput();
+    </script>
+</body>
+
+</html>
