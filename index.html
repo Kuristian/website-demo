@@ -14,9 +14,14 @@
             --text: #f5f7ff;
             --muted: #d2def0;
             --accent: #ffd166;
+            --gravity-accent: #88f6a0;
+            --battery-accent: #38b6ff;
+            --red: #ff6b6b;
+            --green: #51cf66;
+            --blue: #339af0;
             --ok: #88f6a0;
-            --warn: #ffcc5b;
             --bad: #ff8f8f;
+            --waiting: #ffb142;
         }
 
         * {
@@ -26,11 +31,9 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+            font-family: "Segoe UI", sans-serif;
             color: var(--text);
-            background:
-                radial-gradient(1200px 500px at 85% -10%, #2b78bf66 0%, transparent 65%),
-                radial-gradient(1000px 450px at -20% 100%, #f6a62333 0%, transparent 65%),
+            background: radial-gradient(1200px 500px at 85% -10%, #2b78bf66 0%, transparent 65%),
                 linear-gradient(135deg, var(--bg0), var(--bg1));
             display: grid;
             place-items: center;
@@ -43,33 +46,21 @@
             background: var(--card);
             backdrop-filter: blur(8px);
             border-radius: 20px;
-            padding: 20px;
+            padding: 24px;
             box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
-            animation: rise 300ms ease-out;
-        }
-
-        @keyframes rise {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         h1 {
             margin: 0 0 8px;
-            font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
-            letter-spacing: 0.02em;
+            font-size: 1.8rem;
         }
 
-        .sub {
-            margin: 0 0 18px;
+        h3 {
+            margin: 20px 0 8px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
             color: var(--muted);
-            font-size: 0.95rem;
+            letter-spacing: 0.05em;
         }
 
         .row {
@@ -77,7 +68,7 @@
             flex-wrap: wrap;
             gap: 10px;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         button {
@@ -85,22 +76,18 @@
             background: #103150;
             color: var(--text);
             border-radius: 10px;
-            padding: 10px 14px;
+            padding: 10px 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 100ms ease, background 150ms ease;
+            transition: all 150ms ease;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #154166;
         }
 
-        button:active {
-            transform: translateY(1px);
-        }
-
         button:disabled {
-            opacity: 0.45;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
@@ -109,300 +96,1006 @@
             border-color: #f7cb5f66;
         }
 
-        .accent:hover {
-            background: #97720b;
+        .save-btn {
+            background: #2e7d32;
+            border-color: #4caf5066;
         }
 
         .pill {
             border: 1px solid var(--line);
             border-radius: 999px;
-            padding: 8px 12px;
+            padding: 6px 12px;
             background: #0d2a46;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .connected {
             color: var(--ok);
+            border-color: var(--ok);
         }
 
         .disconnected {
             color: var(--bad);
+            border-color: var(--bad);
+        }
+
+        .waiting {
+            color: var(--waiting);
+            border-color: var(--waiting);
         }
 
         .grid {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr 120px;
             gap: 12px;
             align-items: center;
-            margin: 10px 0 14px;
+            margin-bottom: 10px;
         }
 
         input[type="range"] {
             width: 100%;
             accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .grav-slider {
+            accent-color: var(--gravity-accent) !important;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            cursor: pointer;
+            background: #0d2a46;
+            padding: 4px;
+        }
+
+        .lat-slider {
+            accent-color: #6ce5ff !important;
         }
 
         input[type="number"] {
-            width: 100px;
+            width: 100%;
             border: 1px solid var(--line);
             background: #0d2a46;
             color: var(--text);
-            border-radius: 10px;
-            padding: 8px 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.9rem;
         }
 
         .value {
-            font-size: 1.2rem;
             font-weight: 700;
             color: var(--accent);
         }
 
         .log {
-            margin-top: 10px;
+            margin-top: 15px;
             border: 1px solid var(--line);
             background: #081c30;
             border-radius: 12px;
-            height: 220px;
-            overflow: auto;
-            padding: 10px;
-            font-family: Consolas, "Courier New", monospace;
+            height: 150px;
+            overflow-y: scroll;
+            padding: 12px;
+            font-family: 'Consolas', monospace;
             font-size: 12px;
             white-space: pre-wrap;
-            word-break: break-word;
         }
 
-        .help {
-            margin-top: 12px;
-            color: var(--muted);
-            font-size: 0.9rem;
-            line-height: 1.35;
+        .battery-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+
+        .reset-btn-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        #resetBtn {
+            background: #3a2f2f;
+            border-color: #8f5f5f;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #resetBtn:hover:not(:disabled) {
+            background: #4a3f3f;
+        }
+
+        #resetBtn.holding {
+            background: #5a4f4f;
+        }
+
+        .hold-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255, 100, 100, 0.6), rgba(255, 50, 50, 0.6));
+            width: 0%;
+            border-radius: 10px;
+            transition: width 100ms linear;
+            pointer-events: none;
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+
+            0%,
+            100% {
+                box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3);
+            }
+
+            50% {
+                box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.6);
+            }
+        }
+
+        #resetBtn.loading {
+            background: #8f5f5f;
+            animation: loading-pulse 1s infinite;
+        }
+
+        @keyframes loading-pulse {
+
+            0%,
+            100% {
+                background: #8f5f5f;
+                box-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+            }
+
+            50% {
+                background: #a07070;
+                box-shadow: 0 0 20px rgba(255, 100, 100, 0.8);
+            }
+        }
+
+        #resetBtn:disabled {
+            opacity: 0.3;
+        }
+
+
+        .color-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: #000;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
+        .pixel-grid-wrap {
+            overflow-x: auto;
+            margin-bottom: 10px;
+        }
+
+        .pixel-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .pixel-row {
+            display: flex;
+            flex-direction: row;
+            gap: 2px;
+        }
+
+        .pixel-cell {
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            background: #0d2a46;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 100ms, box-shadow 100ms;
+        }
+
+        .pixel-cell.on {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 6px rgba(255, 209, 102, 0.6);
+        }
+
+        .pixel-grid-wrap.disabled .pixel-cell {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+
+        .toggle-btn.active {
+            background: #24613d;
+            border-color: #61b57f;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .mode-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(13, 42, 70, 0.65);
+            padding: 10px;
+        }
+
+        .mode-card button {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .mode-card input[type="color"] {
+            width: 100%;
+            height: 36px;
+        }
+
+        .mode-btn.active {
+            background: #1e5f92;
+            border-color: #7ec8ff;
         }
     </style>
 </head>
 
 <body>
     <main class="panel">
-        <h1>Sandglass Grain Control</h1>
-        <p class="sub">Connect in Google Chrome, read the active grains, and set a new count over WebUSB serial.</p>
-
+        <h1>Sandglass Control</h1>
         <div class="row">
-            <button id="connectBtn" class="accent">Connect</button>
+            <button id="connectBtn" class="accent">Connect Device</button>
             <button id="disconnectBtn" disabled>Disconnect</button>
-            <button id="refreshBtn" disabled>Read Current</button>
+            <button id="refreshBtn" disabled>Refresh Data</button>
+            <button id="saveBtn" class="save-btn" disabled>Save Changes</button>
             <span id="statusPill" class="pill disconnected">Disconnected</span>
-            <span class="pill">Current: <span id="currentValue" class="value">-</span></span>
         </div>
-
-        <div class="grid">
-            <input id="grainSlider" type="range" min="1" max="90" step="1" value="90" disabled />
-            <input id="grainInput" type="number" min="1" max="90" value="90" disabled />
-        </div>
-
         <div class="row">
-            <button id="setBtn" disabled>Set Grains</button>
-            <button id="helpBtn" disabled>Help</button>
+            <span class="pill">Grains: <span id="currentValue" class="value">-</span></span>
+            <span class="pill">Gravity: <span id="currentGravValue"
+                    style="color: var(--gravity-accent); font-weight:700;">-</span></span>
+            <span class="pill">Lateral: <span id="currentLatGravValue"
+                    style="color: #6ce5ff; font-weight:700;">-</span></span>
+        </div>
+        <div class="row">
+            <span class="pill">Menu: <span id="currentMenuStatus" style="font-weight:700;">-</span></span>
+            <span class="pill">Timer Left: <span id="currentTimerRemaining" style="font-weight:700;">-</span>s</span>
+            <span class="pill">Orientation: <span id="currentOrientation" style="font-weight:700;">-</span></span>
+            <span class="pill">Sand Colour <div id="previewPill" class="color-preview"></div></span>
         </div>
 
-        <div id="log" class="log" aria-live="polite"></div>
+        <h3>Modes</h3>
+        <div class="mode-grid">
+            <div class="mode-card">
+                <button id="modeBtnTimer" class="mode-btn" disabled>Timer</button>
+                <input id="modeColorTimer" type="color" value="#FFD166" disabled />
+            </div>
+            <div class="mode-card">
+                <button id="modeBtnPomodoro" class="mode-btn" disabled>Pomodoro</button>
+                <input id="modeColorPomodoro" type="color" value="#FF6B6B" disabled />
+            </div>
+            <div class="mode-card">
+                <button id="modeBtnSandbox" class="mode-btn" disabled>Sandbox</button>
+                <input id="modeColorSandbox" type="color" value="#51CF66" disabled />
+            </div>
+            <div class="mode-card">
+                <button id="modeBtnPixelArt" class="mode-btn" disabled>Pixel Art</button>
+                <input id="modeColorPixelArt" type="color" value="#339AF0" disabled />
+            </div>
+        </div>
 
-        <p class="help">
-            If Connect fails: run this page from localhost (not file://). Example: <b>python -m http.server 8080</b> in
-            this folder, then open <b>http://localhost:8080/index.html</b>.
-        </p>
+        <h3>Grains (1 - <span id="maxLabel">90</span>)</h3>
+        <div class="grid">
+            <input id="grainSlider" type="range" min="1" max="90" step="1" value="45" disabled />
+            <input id="grainInput" type="number" min="1" max="90" value="45" disabled />
+        </div>
+
+        <h3>Gravity (-32000 to 32000)</h3>
+        <div class="grid">
+            <input id="gravSlider" class="grav-slider" type="range" min="-32000" max="32000" step="100" value="9800"
+                disabled />
+            <input id="gravInput" type="number" min="-32000" max="32000" value="9800" disabled />
+        </div>
+
+        <h3>Lateral Gravity (0 to 32000)</h3>
+        <div class="grid">
+            <input id="latGravSlider" class="lat-slider" type="range" min="0" max="32000" step="100" value="3000"
+                disabled />
+            <input id="latGravInput" type="number" min="0" max="32000" value="3000" disabled />
+        </div>
+
+        <h3>Timer Duration (0 to 5970 sec)</h3>
+        <div class="grid">
+            <input id="timerDurationSlider" type="range" min="0" max="5970" step="30" value="0" disabled />
+            <input id="timerDurationInput" type="number" min="0" max="5970" step="30" value="0" disabled />
+        </div>
+
+        <h3>Sand Colour</h3>
+        <div class="grid">
+            <input id="colorPicker" type="color" value="#000000" disabled />
+        </div>
+
+        <h3>Pixel Editor (14 × 24 Hourglass)</h3>
+        <div class="row">
+            <input id="pixelColorPicker" type="color" value="#FFD166" disabled />
+            <span class="pill">Pixel Colour <div id="pixelPreviewPill" class="color-preview"
+                    style="background: #FFD166;"></div></span>
+        </div>
+        <div class="pixel-grid-wrap disabled" id="pixelGridWrap">
+            <div class="pixel-grid" id="pixelGrid"></div>
+        </div>
+        <div class="row">
+            <button id="clearGridBtn" disabled>Clear All Pixels</button>
+        </div>
+
+        <h3>Testing Controls</h3>
+        <div class="grid">
+            <input id="testSliderA" type="range" min="-1000" max="1000" step="1" value="0" disabled />
+            <input id="testInputA" type="number" min="-1000" max="1000" value="0" disabled />
+        </div>
+        <div class="grid">
+            <input id="testSliderB" type="range" min="-1000" max="1000" step="1" value="0" disabled />
+            <input id="testInputB" type="number" min="-1000" max="1000" value="0" disabled />
+        </div>
+        <div class="row">
+            <button id="testToggle1" class="toggle-btn" disabled>Test Toggle 1: OFF</button>
+            <button id="testToggle2" class="toggle-btn" disabled>Test Toggle 2: OFF</button>
+            <button id="testToggle3" class="toggle-btn" disabled>Test Toggle 3: OFF</button>
+            <button id="testToggle4" class="toggle-btn" disabled>Test Toggle 4: OFF</button>
+            <button id="testToggle5" class="toggle-btn" disabled>Test Toggle 5: OFF</button>
+        </div>
+
+        <h3>System</h3>
+        <div class="row">
+            <div class="reset-btn-container">
+                <button id="resetBtn" disabled>Reset NVS Memory (Hold 5s)</button>
+                <div class="hold-indicator" id="holdIndicator"></div>
+            </div>
+        </div>
+
+        <div class="battery-footer">
+            <span>System Status</span>
+            <div class="row" style="margin-bottom: 0;">
+                <span class="pill">Voltage: <span id="battVolts"
+                        style="color: var(--battery-accent); font-weight:700;">-</span>V</span>
+                <span class="pill">Charge: <span id="battPerc"
+                        style="color: var(--battery-accent); font-weight:700;">-</span>%</span>
+            </div>
+        </div>
+        <div id="log" class="log"></div>
     </main>
 
     <script>
-        const connectBtn = document.getElementById('connectBtn');
-        const disconnectBtn = document.getElementById('disconnectBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const setBtn = document.getElementById('setBtn');
-        const helpBtn = document.getElementById('helpBtn');
-        const slider = document.getElementById('grainSlider');
-        const input = document.getElementById('grainInput');
-        const statusPill = document.getElementById('statusPill');
-        const currentValue = document.getElementById('currentValue');
-        const logEl = document.getElementById('log');
+        let port = null, reader = null, writer = null, keepReading = true;
+        let batteryInterval = null, setupTimeout = null, commandQueue = [], isProcessingQueue = false;
+        let setupConfirmed = false;
+        window.colorState = { r: 0, g: 0, b: 0 };
+        window.pixelColorState = '#FFD166';
+        let userInteractingWithColorPicker = false;
+        let maxSandComponent = 50;
+        const modeOrder = ['TIMER', 'POMODORO', 'SANDBOX', 'PIXELART'];
+        const modeCommandValue = { TIMER: 0, POMODORO: 1, SANDBOX: 2, PIXELART: 3 };
+        const modeButtonId = {
+            TIMER: 'modeBtnTimer',
+            POMODORO: 'modeBtnPomodoro',
+            SANDBOX: 'modeBtnSandbox',
+            PIXELART: 'modeBtnPixelArt'
+        };
+        const modeColorId = {
+            TIMER: 'modeColorTimer',
+            POMODORO: 'modeColorPomodoro',
+            SANDBOX: 'modeColorSandbox',
+            PIXELART: 'modeColorPixelArt'
+        };
+        let activeMode = null;
 
-        let port = null;
-        let reader = null;
-        let writer = null;
-        let keepReading = false;
+        const el = (id) => document.getElementById(id);
+        const logEl = el('log');
 
         function log(msg) {
-            const ts = new Date().toLocaleTimeString();
+            const ts = new Date().toLocaleTimeString([], { hour12: false });
             logEl.textContent += `[${ts}] ${msg}\n`;
             logEl.scrollTop = logEl.scrollHeight;
         }
 
-        function setConnectedUI(connected) {
-            disconnectBtn.disabled = !connected;
-            refreshBtn.disabled = !connected;
-            setBtn.disabled = !connected;
-            helpBtn.disabled = !connected;
-            slider.disabled = !connected;
-            input.disabled = !connected;
-            statusPill.textContent = connected ? 'Connected' : 'Disconnected';
-            statusPill.className = `pill ${connected ? 'connected' : 'disconnected'}`;
-            connectBtn.disabled = connected;
+        function send(cmd) {
+            if (!port || !writer) return;
+            commandQueue.push(cmd);
+            processQueue();
         }
 
-        function syncValueFromSlider() {
-            input.value = slider.value;
+        function setPixelCellVisual(cell, isOn, colorHex) {
+            cell.classList.toggle('on', isOn);
+            if (isOn) {
+                cell.style.background = colorHex;
+                cell.style.borderColor = colorHex;
+                cell.style.boxShadow = `0 0 6px ${colorHex}99`;
+            } else {
+                cell.style.background = '';
+                cell.style.borderColor = '';
+                cell.style.boxShadow = '';
+            }
         }
 
-        function syncValueFromInput() {
-            const min = Number(input.min);
-            const max = Number(input.max);
-            let v = Number(input.value);
-            if (!Number.isFinite(v)) v = min;
-            v = Math.max(min, Math.min(max, Math.round(v)));
-            input.value = String(v);
-            slider.value = String(v);
+        function updatePixelPreview() {
+            el('pixelPreviewPill').style.background = window.pixelColorState;
+        }
+
+        async function processQueue() {
+            if (isProcessingQueue || commandQueue.length === 0 || !writer) return;
+            isProcessingQueue = true;
+            const encoder = new TextEncoder();
+            while (commandQueue.length > 0 && writer) {
+                const cmd = commandQueue.shift();
+                try {
+                    await writer.write(encoder.encode(cmd + '\n'));
+                    log(`>> ${cmd}`);
+                } catch (err) { log(`Write Error: ${err.message}`); }
+                await new Promise(r => setTimeout(r, 15));
+            }
+            isProcessingQueue = false;
+        }
+
+        // Build pixel grid
+        const COLS = 14, ROWS = 24;
+        const pixelState = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
+        const gridEl = el('pixelGrid');
+        // Cells stored row-major: cell at (col, row) = cells[row * COLS + col]
+        const cells = new Array(ROWS * COLS).fill(null);
+
+        // Stepped hourglass widths (24 rows total):
+        // Top:    rows 0-3=14, 4-5=12, 6=10, 7=8, 8=6, 9=4, 10-11=2 (neck)
+        // Bottom: mirror — rows 12-13=2, 14=4, 15=6, 16=8, 17=10, 18-19=12, 20-23=14
+        function getHourglassWidth(row) {
+            const r = row < 12 ? row : 23 - row; // mirror around center
+            if (r <= 3) return 14;
+            if (r <= 5) return 12;
+            if (r <= 7) return 10;
+            if (r === 8) return 8;
+            if (r === 9) return 6;
+            if (r === 10) return 4;
+            return 2; // rows 10-11 (and mirrored 12-13) form the neck
+        }
+
+        function isInHourglass(col, row) {
+            const width = getHourglassWidth(row);
+            const startCol = (COLS - width) / 2;
+            return col >= startCol && col < startCol + width;
+        }
+
+        for (let row = 0; row < ROWS; row++) {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'pixel-row';
+            const width = getHourglassWidth(row);
+            const startCol = (COLS - width) / 2;
+            for (let col = startCol; col < startCol + width; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'pixel-cell';
+                cell.dataset.col = col;
+                cell.dataset.row = row;
+                cell.addEventListener('click', () => {
+                    if (el('pixelGridWrap').classList.contains('disabled')) return;
+                    const newState = !pixelState[row][col];
+                    pixelState[row][col] = newState;
+                    if (newState) {
+                        const rgb = hexToRgb(window.pixelColorState);
+                        setPixelCellVisual(cell, true, window.pixelColorState);
+                        send(`pixelrgb ${col} ${row} ${rgb.r} ${rgb.g} ${rgb.b}`);
+                    } else {
+                        setPixelCellVisual(cell, false, window.pixelColorState);
+                        send(`pixel ${col} ${row} 0`);
+                    }
+                });
+                cells[row * COLS + col] = cell;
+                rowEl.appendChild(cell);
+            }
+            gridEl.appendChild(rowEl);
+        }
+
+        el('clearGridBtn').onclick = () => {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (isInHourglass(col, row) && pixelState[row][col]) {
+                        pixelState[row][col] = false;
+                        setPixelCellVisual(cells[row * COLS + col], false, window.pixelColorState);
+                        send(`pixel ${col} ${row} 0`);
+                    }
+                }
+            }
+        };
+
+        function setUIState(state) {
+            const connected = state === 'connected';
+            const waiting = state === 'waiting';
+            // const ids = ['disconnectBtn', 'refreshBtn', 'setBtn', 'setGravBtn', 'resetBtn', 'grainSlider', 'grainInput', 'gravSlider', 'gravInput'];
+            const ids = ['disconnectBtn', 'refreshBtn', 'saveBtn', 'grainSlider', 'grainInput', 'gravSlider', 'gravInput', 'latGravSlider', 'latGravInput', 'timerDurationSlider', 'timerDurationInput', 'colorPicker', 'pixelColorPicker', 'resetBtn', 'clearGridBtn', 'testSliderA', 'testInputA', 'testSliderB', 'testInputB', 'testToggle1', 'testToggle2', 'testToggle3', 'testToggle4', 'testToggle5', 'modeBtnTimer', 'modeBtnPomodoro', 'modeBtnSandbox', 'modeBtnPixelArt', 'modeColorTimer', 'modeColorPomodoro', 'modeColorSandbox', 'modeColorPixelArt'];
+            ids.forEach(id => el(id).disabled = !connected);
+            el('pixelGridWrap').classList.toggle('disabled', !connected);
+            el('connectBtn').disabled = (connected || waiting);
+            const pill = el('statusPill');
+            if (waiting) { pill.textContent = 'Waiting for Setup...'; pill.className = 'pill waiting'; }
+            else if (connected) { pill.textContent = 'Connected'; pill.className = 'pill connected'; batteryInterval = setInterval(() => { send('battery charge?'); send('battery voltage?'); }, 10000); }
+            else {
+                pill.textContent = 'Disconnected';
+                pill.className = 'pill disconnected';
+                el('currentMenuStatus').textContent = '-';
+                el('currentTimerRemaining').textContent = '-';
+                el('currentOrientation').textContent = '-';
+                if (batteryInterval) clearInterval(batteryInterval);
+                if (setupTimeout) clearTimeout(setupTimeout);
+                commandQueue = [];
+                setupConfirmed = false;
+            }
+        }
+
+        function triggerInitialRequests() {
+            if (setupConfirmed) return;
+            setupConfirmed = true;
+            if (setupTimeout) clearTimeout(setupTimeout);
+            setUIState('connected');
+            log('System: Initializing...');
+
+            // Phase 1: Critical UI data (fast)
+            send('max grains?');
+            send('max colour?');
+            send('grains?');
+            send('gravity?');
+            send('lateral gravity?');
+            send('menu status?');
+            send('timer remaining?');
+            send('timer duration?');
+            send('orientation?');
+            send('sand colour red?');
+            send('sand colour green?');
+            send('sand colour blue?');
+            send('mode colour 0?');
+            send('mode colour 1?');
+            send('mode colour 2?');
+            send('mode colour 3?');
+
+            // Phase 2: Optional data (deferred, non-blocking)
+            setTimeout(() => {
+                send('test slider a?');
+                send('test slider b?');
+                send('test toggle 1?');
+                send('test toggle 2?');
+                send('test toggle 3?');
+                send('test toggle 4?');
+                send('test toggle 5?');
+                send('battery charge?');
+                send('battery voltage?');
+            }, 500);
+        }
+
+        function updateColorPickerFromState() {
+            if (!window.colorState || userInteractingWithColorPicker) return;
+            const r = sandToDisplay(window.colorState.r);
+            const g = sandToDisplay(window.colorState.g);
+            const b = sandToDisplay(window.colorState.b);
+            const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0').toUpperCase()).join('');
+            el('colorPicker').value = hex;
+        }
+
+        function updatePreview() {
+            if (!window.colorState) window.colorState = { r: 0, g: 0, b: 0 };
+            el('previewPill').style.background = `rgb(${sandToDisplay(window.colorState.r)}, ${sandToDisplay(window.colorState.g)}, ${sandToDisplay(window.colorState.b)})`;
+        }
+
+        function sandToDisplay(v) {
+            const safeMax = Math.max(1, maxSandComponent);
+            const clamped = Math.min(safeMax, Math.max(0, Number(v) || 0));
+            return Math.round((clamped / safeMax) * 255);
+        }
+
+        function displayToSand(v) {
+            const safeMax = Math.max(1, maxSandComponent);
+            const clamped = Math.min(255, Math.max(0, Number(v) || 0));
+            return Math.round((clamped / 255) * safeMax);
+        }
+
+        function hexToSandRgb(hex) {
+            const rgb = hexToRgb(hex);
+            return {
+                r: displayToSand(rgb.r),
+                g: displayToSand(rgb.g),
+                b: displayToSand(rgb.b)
+            };
+        }
+
+        function setModePickerFromSand(modeName, r, g, b) {
+            const hex = '#' + [sandToDisplay(r), sandToDisplay(g), sandToDisplay(b)]
+                .map(x => x.toString(16).padStart(2, '0').toUpperCase())
+                .join('');
+            el(modeColorId[modeName]).value = hex;
+        }
+
+        function setTestToggleState(idx, on) {
+            const id = `testToggle${idx}`;
+            const btn = el(id);
+            btn.classList.toggle('active', on);
+            btn.textContent = `Test Toggle ${idx}: ${on ? 'ON' : 'OFF'}`;
+        }
+
+        function setActiveMode(modeName) {
+            activeMode = modeName;
+            modeOrder.forEach((name) => {
+                el(modeButtonId[name]).classList.toggle('active', name === modeName);
+            });
+        }
+
+        function applyModeColor(modeName, throttled = false) {
+            const rgb = hexToSandRgb(el(modeColorId[modeName]).value);
+            const modeIdx = modeCommandValue[modeName];
+            window.colorState = rgb;
+            updateColorPickerFromState();
+            updatePreview();
+            if (throttled) {
+                sendModeColorComponent(modeIdx, rgb.r, rgb.g, rgb.b);
+            } else {
+                send(`mode colour ${modeIdx} ${rgb.r} ${rgb.g} ${rgb.b}`);
+            }
+        }
+
+        function switchMode(modeName, sendToDevice = true) {
+            setActiveMode(modeName);
+            if (sendToDevice) {
+                send(`set menu ${modeCommandValue[modeName]}`);
+            }
+            const rgb = hexToSandRgb(el(modeColorId[modeName]).value);
+            window.colorState = rgb;
+            updateColorPickerFromState();
+            updatePreview();
         }
 
         function parseLine(line) {
-            const mCurrent = line.match(/\[WEBUSB\]\s+grains=(\d+)/);
-            if (mCurrent) {
-                const value = Number(mCurrent[1]);
-                if (Number.isFinite(value)) {
-                    currentValue.textContent = String(value);
-                    slider.value = String(value);
-                    input.value = String(value);
-                }
+            if (!setupConfirmed && line.toLowerCase().includes("setup complete")) { triggerInitialRequests(); }
+
+            // Max Handlers
+            const mmg = line.match(/max grains\s*[=:]\s*(\d+)/i);
+            if (mmg) { el('maxLabel').textContent = mmg[1]; el('grainSlider').max = mmg[1]; el('grainInput').max = mmg[1]; }
+
+            const mmc = line.match(/max colour\s*[=:]\s*(\d+)/i);
+            if (mmc) {
+                maxSandComponent = Number(mmc[1]) || maxSandComponent;
+                updateColorPickerFromState();
+                updatePreview();
             }
 
-            const mSet = line.match(/\[WEBUSB\]\s+grains set to\s+(\d+)/i);
-            if (mSet) {
-                const value = Number(mSet[1]);
-                if (Number.isFinite(value)) {
-                    currentValue.textContent = String(value);
-                }
-            }
-
-            const mRange = line.match(/commands:\s+grains <1-(\d+)>/i);
-            if (mRange) {
-                const max = Number(mRange[1]);
-                if (Number.isFinite(max) && max > 0) {
-                    slider.max = String(max);
-                    input.max = String(max);
-                    syncValueFromInput();
-                }
-            }
-        }
-
-        async function sendCommand(cmd) {
-            if (!writer) return;
-            try {
-                await writer.write(`${cmd}\n`);
-                log(`> ${cmd}`);
-            } catch (err) {
-                log(`Write error: ${err.message}`);
-            }
-        }
-
-        async function startReadLoop() {
-            if (!port || !port.readable) return;
-
-            const decoder = new TextDecoderStream();
-            const inputDone = port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable;
-            reader = inputStream.getReader();
-
-            try {
-                while (keepReading) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-
-                    if (value) {
-                        const lines = value.split('\n');
-                        for (const line of lines) {
-                            const cleanLine = line.trim();
-                            if (cleanLine) {
-                                log(cleanLine);
-                                parseLine(cleanLine);
-                            }
-                        }
+            // Grains and Gravity
+            const mg = line.match(/grains\s*[=:]\s*(\d+)/i); if (mg) { el('currentValue').textContent = mg[1]; el('grainSlider').value = mg[1]; el('grainInput').value = mg[1]; }
+            const mlat = line.match(/(?:^|\])\s*lateral gravity\s*[=:]\s*(-?\d+)/i); if (mlat) { el('currentLatGravValue').textContent = mlat[1]; el('latGravSlider').value = mlat[1]; el('latGravInput').value = mlat[1]; }
+            const mv = line.match(/(?:^|\])\s*gravity\s*[=:]\s*(-?\d+)/i); if (mv) { el('currentGravValue').textContent = mv[1]; el('gravSlider').value = mv[1]; el('gravInput').value = mv[1]; }
+            const mmenu = line.match(/menu status\s*[=:]\s*([A-Za-z_]+)/i); if (mmenu) { el('currentMenuStatus').textContent = mmenu[1]; const modeName = mmenu[1].toUpperCase(); if (modeOrder.includes(modeName)) setActiveMode(modeName); }
+            const mmodeColor = line.match(/mode colour\s+(\d)\s*[=:]\s*(\d+)\s+(\d+)\s+(\d+)/i);
+            if (mmodeColor) {
+                const idx = Number(mmodeColor[1]);
+                const r = Number(mmodeColor[2]);
+                const g = Number(mmodeColor[3]);
+                const b = Number(mmodeColor[4]);
+                if (idx >= 0 && idx < modeOrder.length) {
+                    const modeName = modeOrder[idx];
+                    setModePickerFromSand(modeName, r, g, b);
+                    if (activeMode === modeName) {
+                        window.colorState = { r, g, b };
+                        updateColorPickerFromState();
+                        updatePreview();
                     }
                 }
-            } catch (err) {
-                log(`Read error: ${err.message}`);
-            } finally {
-                reader.releaseLock();
             }
+            const mtimer = line.match(/timer remaining\s*[=:]\s*(\d+)/i) || line.match(/timer\s*[=:]\s*(\d+)/i) || line.match(/timer:\s*(\d+)/i);
+            if (mtimer) { el('currentTimerRemaining').textContent = mtimer[1]; }
+            const mtimerDuration = line.match(/timer duration\s*[=:]\s*(\d+)/i);
+            if (mtimerDuration) {
+                el('timerDurationSlider').value = mtimerDuration[1];
+                el('timerDurationInput').value = mtimerDuration[1];
+            }
+            const morient = line.match(/orientation\s*[=:]\s*(\d+)/i);
+            if (morient) { el('currentOrientation').textContent = morient[1] === '1' ? 'Up' : 'Down'; }
+
+            // Test controls
+            const mtestA = line.match(/test slider a\s*[=:]\s*(-?\d+)/i); if (mtestA) { el('testSliderA').value = mtestA[1]; el('testInputA').value = mtestA[1]; }
+            const mtestB = line.match(/test slider b\s*[=:]\s*(-?\d+)/i); if (mtestB) { el('testSliderB').value = mtestB[1]; el('testInputB').value = mtestB[1]; }
+            const mtestToggle = line.match(/test toggle\s*(\d)\s*[=:]\s*(\d)/i);
+            if (mtestToggle) {
+                const idx = Number(mtestToggle[1]);
+                const on = Number(mtestToggle[2]) === 1;
+                if (idx >= 1 && idx <= 5) setTestToggleState(idx, on);
+            }
+
+            // Colour Parsers - handles "red=10", "red:10", "sand colour red=10", etc.
+            const mr = line.match(/(?:sand colour )?red\s*[=:]\s*(\d+)/i);
+            if (mr) {
+                if (!window.colorState) window.colorState = { r: 0, g: 0, b: 0 };
+                window.colorState.r = parseInt(mr[1]);
+                updateColorPickerFromState();
+                updatePreview();
+            }
+            const mgreen = line.match(/(?:sand colour )?green\s*[=:]\s*(\d+)/i);
+            if (mgreen) {
+                if (!window.colorState) window.colorState = { r: 0, g: 0, b: 0 };
+                window.colorState.g = parseInt(mgreen[1]);
+                updateColorPickerFromState();
+                updatePreview();
+            }
+            const mb = line.match(/(?:sand colour )?blue\s*[=:]\s*(\d+)/i);
+            if (mb) {
+                if (!window.colorState) window.colorState = { r: 0, g: 0, b: 0 };
+                window.colorState.b = parseInt(mb[1]);
+                updateColorPickerFromState();
+                updatePreview();
+            }
+
+            // Battery
+            const mt = line.match(/battery voltage\s*[=:]\s*([\d.]+)/i); if (mt) el('battVolts').textContent = mt[1];
+            const mc = line.match(/battery charge\s*[=:]\s*([\d.]+)/i); if (mc) el('battPerc').textContent = mc[1];
         }
 
         async function connect() {
-            if (!('serial' in navigator)) {
-                alert('Web Serial API is not available. Use Google Chrome over HTTPS/localhost.');
-                return;
-            }
-
             try {
                 port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 115200 });
+                await port.open({ baudRate: 921600 });
+                writer = port.writable.getWriter();
+                reader = port.readable.getReader();
+                keepReading = true; setupConfirmed = false;
+                setUIState('waiting');
 
-                const encoder = new TextEncoderStream();
-                encoder.readable.pipeTo(port.writable);
-                writer = encoder.writable.getWriter();
+                // Request data immediately (don't wait for "setup complete")
+                setupTimeout = setTimeout(() => triggerInitialRequests(), 100);
 
-                setConnectedUI(true);
-                keepReading = true;
-                log('connected');
-
-                startReadLoop(); // Run in background
-                await sendCommand('help');
-                await sendCommand('grains?');
-            } catch (err) {
-                log(`connect failed: ${err.message}`);
-                await disconnect();
-            }
+                const decoder = new TextDecoder();
+                let partialLine = '';
+                while (keepReading) {
+                    try {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        partialLine += decoder.decode(value, { stream: true });
+                        const lines = partialLine.split('\n');
+                        partialLine = lines.pop();
+                        lines.forEach(l => { if (l.trim()) { log(l.trim()); parseLine(l.trim()); } });
+                    } catch (e) { break; }
+                }
+            } catch (err) { log(`Error: ${err.message}`); disconnect(); }
         }
 
         async function disconnect() {
             keepReading = false;
-
-            try {
-                if (reader) {
-                    await reader.cancel();
-                    reader = null;
-                }
-            } catch (_) { }
-
-            try {
-                if (writer) {
-                    await writer.close();
-                    writer = null;
-                }
-            } catch (_) { }
-
-            try {
-                if (port) {
-                    await port.close();
-                    port = null;
-                }
-            } catch (_) { }
-
-            setConnectedUI(false);
-            log('disconnected');
+            if (reader) { try { await reader.cancel(); reader.releaseLock(); } catch (e) { } reader = null; }
+            if (writer) { try { writer.releaseLock(); } catch (e) { } writer = null; }
+            if (port) { try { await port.close(); } catch (e) { } port = null; }
+            setUIState('disconnected');
+            log('Released.');
         }
 
-        connectBtn.addEventListener('click', connect);
-        disconnectBtn.addEventListener('click', disconnect);
-        refreshBtn.addEventListener('click', () => sendCommand('grains?'));
-        helpBtn.addEventListener('click', () => sendCommand('help'));
+        el('connectBtn').onclick = connect;
+        el('disconnectBtn').onclick = disconnect;
+        el('refreshBtn').onclick = () => {
+            send('max grains?'); send('max colour?'); send('grains?'); send('gravity?');
+            send('lateral gravity?');
+            send('menu status?'); send('timer remaining?'); send('orientation?');
+            send('timer duration?');
+            send('mode colour 0?'); send('mode colour 1?'); send('mode colour 2?'); send('mode colour 3?');
+            send('test slider a?'); send('test slider b?');
+            send('test toggle 1?'); send('test toggle 2?'); send('test toggle 3?'); send('test toggle 4?'); send('test toggle 5?');
+            send('sand colour red?'); send('sand colour green?'); send('sand colour blue?');
+            send('battery charge?'); send('battery voltage?');
+        };
+        el('saveBtn').onclick = () => send('nvs');
 
-        setBtn.addEventListener('click', async () => {
-            syncValueFromInput();
-            await sendCommand(`grains ${input.value}`);
-            await sendCommand('grains?');
+        function throttle(f, l) { let t; return function () { if (!t) { f.apply(this, arguments); t = true; setTimeout(() => t = false, l); } } }
+
+        const nameMap = { r: 'red', g: 'green', b: 'blue' };
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        }
+
+        const sendColorComponent = throttle((r, g, b) => {
+            send(`sand red ${r}`);
+            send(`sand green ${g}`);
+            send(`sand blue ${b}`);
+        }, 200);
+
+        const sendModeColorComponent = throttle((modeIdx, r, g, b) => {
+            send(`mode colour ${modeIdx} ${r} ${g} ${b}`);
+        }, 200);
+
+        el('colorPicker').addEventListener('input', (e) => {
+            userInteractingWithColorPicker = true;
+            const rgb = hexToSandRgb(e.target.value);
+            window.colorState = rgb;
+            updatePreview();
+            sendColorComponent(rgb.r, rgb.g, rgb.b);
+            if (activeMode && modeColorId[activeMode]) {
+                el(modeColorId[activeMode]).value = e.target.value;
+                sendModeColorComponent(modeCommandValue[activeMode], rgb.r, rgb.g, rgb.b);
+            }
         });
 
-        slider.addEventListener('input', syncValueFromSlider);
-        input.addEventListener('input', syncValueFromInput);
+        el('colorPicker').addEventListener('change', (e) => {
+            const rgb = hexToSandRgb(e.target.value);
+            window.colorState = rgb;
+            updatePreview();
+            send(`sand red ${rgb.r}`);
+            send(`sand green ${rgb.g}`);
+            send(`sand blue ${rgb.b}`);
+            userInteractingWithColorPicker = false;
+            if (activeMode && modeColorId[activeMode]) {
+                el(modeColorId[activeMode]).value = e.target.value;
+                send(`mode colour ${modeCommandValue[activeMode]} ${rgb.r} ${rgb.g} ${rgb.b}`);
+            }
+        });
 
-        setConnectedUI(false);
-        syncValueFromInput();
+        el('colorPicker').addEventListener('mouseout', () => {
+            userInteractingWithColorPicker = false;
+        });
+
+        el('colorPicker').addEventListener('touchend', () => {
+            userInteractingWithColorPicker = false;
+        });
+
+        el('pixelColorPicker').addEventListener('input', (e) => {
+            window.pixelColorState = e.target.value;
+            updatePixelPreview();
+        });
+
+        modeOrder.forEach((modeName) => {
+            el(modeButtonId[modeName]).addEventListener('click', () => {
+                switchMode(modeName, true);
+            });
+
+            el(modeColorId[modeName]).addEventListener('input', () => {
+                if (activeMode === modeName) {
+                    applyModeColor(modeName, true);
+                }
+            });
+
+            el(modeColorId[modeName]).addEventListener('change', () => {
+                if (activeMode === modeName) {
+                    applyModeColor(modeName, false);
+                }
+            });
+        });
+
+        updatePixelPreview();
+
+        // Reset NVS Button with Hold Detection
+        let resetHoldStart = null;
+        let resetHoldInterval = null;
+        const HOLD_TIME = 5000; // 5 seconds in milliseconds
+
+        el('resetBtn').addEventListener('mousedown', (e) => {
+            if (el('resetBtn').disabled) return;
+            resetHoldStart = Date.now();
+            el('resetBtn').classList.add('holding');
+
+            resetHoldInterval = setInterval(() => {
+                if (!resetHoldStart) {
+                    clearInterval(resetHoldInterval);
+                    return;
+                }
+                const elapsed = Date.now() - resetHoldStart;
+                const progress = Math.min(elapsed / HOLD_TIME, 1) * 100;
+                el('holdIndicator').style.width = progress + '%';
+
+                if (elapsed >= HOLD_TIME) {
+                    clearInterval(resetHoldInterval);
+                    resetHoldStart = null;
+                    triggerNVSReset();
+                }
+            }, 30);
+        });
+
+        el('resetBtn').addEventListener('mouseup', () => {
+            el('resetBtn').classList.remove('holding');
+            el('holdIndicator').style.width = '0%';
+            clearInterval(resetHoldInterval);
+            resetHoldStart = null;
+        });
+
+        el('resetBtn').addEventListener('mouseleave', () => {
+            el('resetBtn').classList.remove('holding');
+            el('holdIndicator').style.width = '0%';
+            clearInterval(resetHoldInterval);
+            resetHoldStart = null;
+        });
+
+        el('resetBtn').addEventListener('touchstart', (e) => {
+            if (el('resetBtn').disabled) return;
+            resetHoldStart = Date.now();
+            el('resetBtn').classList.add('holding');
+
+            resetHoldInterval = setInterval(() => {
+                if (!resetHoldStart) {
+                    clearInterval(resetHoldInterval);
+                    return;
+                }
+                const elapsed = Date.now() - resetHoldStart;
+                const progress = Math.min(elapsed / HOLD_TIME, 1) * 100;
+                el('holdIndicator').style.width = progress + '%';
+
+                if (elapsed >= HOLD_TIME) {
+                    clearInterval(resetHoldInterval);
+                    resetHoldStart = null;
+                    triggerNVSReset();
+                }
+            }, 30);
+        });
+
+        el('resetBtn').addEventListener('touchend', () => {
+            el('resetBtn').classList.remove('holding');
+            el('holdIndicator').style.width = '0%';
+            clearInterval(resetHoldInterval);
+            resetHoldStart = null;
+        });
+
+        async function triggerNVSReset() {
+            el('resetBtn').classList.add('loading');
+            el('resetBtn').disabled = true;
+            log('>> nvs reset');
+            await send('nvs reset');
+
+            // Wait briefly to receive the response
+            setTimeout(() => {
+                el('resetBtn').classList.remove('loading');
+                el('resetBtn').disabled = false;
+            }, 1500);
+        }
+
+        const sg = throttle((v) => send(`grains ${v}`), 200);
+        const sv = throttle((v) => send(`gravity ${v}`), 200);
+        const slat = throttle((v) => send(`lateral gravity ${v}`), 200);
+        const stimerDuration = throttle((v) => send(`timer duration ${v}`), 200);
+        const stestA = throttle((v) => send(`test slider a ${v}`), 120);
+        const stestB = throttle((v) => send(`test slider b ${v}`), 120);
+        el('grainSlider').oninput = (e) => { el('grainInput').value = e.target.value; sg(e.target.value); };
+        el('grainSlider').onchange = (e) => send(`grains ${e.target.value}`);
+        el('grainInput').onchange = (e) => { el('grainSlider').value = e.target.value; send(`grains ${e.target.value}`); };
+        el('gravSlider').oninput = (e) => { el('gravInput').value = e.target.value; sv(e.target.value); };
+        el('gravSlider').onchange = (e) => send(`gravity ${e.target.value}`);
+        el('gravInput').onchange = (e) => { el('gravSlider').value = e.target.value; send(`gravity ${e.target.value}`); };
+        el('latGravSlider').oninput = (e) => { el('latGravInput').value = e.target.value; slat(e.target.value); };
+        el('latGravSlider').onchange = (e) => send(`lateral gravity ${e.target.value}`);
+        el('latGravInput').onchange = (e) => { el('latGravSlider').value = e.target.value; send(`lateral gravity ${e.target.value}`); };
+        el('timerDurationSlider').oninput = (e) => { el('timerDurationInput').value = e.target.value; stimerDuration(e.target.value); };
+        el('timerDurationSlider').onchange = (e) => send(`timer duration ${e.target.value}`);
+        el('timerDurationInput').onchange = (e) => {
+            const v = Math.max(0, Math.min(5970, Number(e.target.value) || 0));
+            const rounded = Math.round(v / 30) * 30;
+            el('timerDurationInput').value = rounded;
+            el('timerDurationSlider').value = rounded;
+            send(`timer duration ${rounded}`);
+        };
+
+        el('testSliderA').oninput = (e) => { el('testInputA').value = e.target.value; stestA(e.target.value); };
+        el('testSliderA').onchange = (e) => send(`test slider a ${e.target.value}`);
+        el('testInputA').onchange = (e) => { el('testSliderA').value = e.target.value; send(`test slider a ${e.target.value}`); };
+        el('testSliderB').oninput = (e) => { el('testInputB').value = e.target.value; stestB(e.target.value); };
+        el('testSliderB').onchange = (e) => send(`test slider b ${e.target.value}`);
+        el('testInputB').onchange = (e) => { el('testSliderB').value = e.target.value; send(`test slider b ${e.target.value}`); };
+
+        ['testToggle1', 'testToggle2', 'testToggle3', 'testToggle4', 'testToggle5'].forEach((id, idx) => {
+            el(id).addEventListener('click', () => {
+                const toggleIndex = idx + 1;
+                const on = !el(id).classList.contains('active');
+                setTestToggleState(toggleIndex, on);
+                send(`test toggle ${toggleIndex} ${on ? 1 : 0}`);
+            });
+        });
     </script>
 </body>
 
